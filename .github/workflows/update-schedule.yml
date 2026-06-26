@@ -1,0 +1,51 @@
+name: Update Motorsports Schedule
+
+on:
+  schedule:
+    # Se ejecuta todos los días a las 08:00 UTC (aprox 3:00 AM dependiendo de tu zona)
+    - cron: '0 8 * * *'
+  # Permite ejecutar el robot manualmente con un botón desde GitHub
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Run Scraper Script
+        run: node scripts/scraper.js
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git status
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and Push changes
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          git add src/data/races.js
+          git commit -m "Automated schedule update"
+          git push
+
+      - name: Deploy to GitHub Pages (Build)
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          npm install
+          npm run build
+          # Nota: Si ya tienes configurado GitHub Pages para leer de otra rama (ej. gh-pages) 
+          # aquí podrías integrar la acción de deploy.
