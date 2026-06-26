@@ -206,8 +206,14 @@ a {
 }
 
 .category-f1 { background-color: var(--accent-f1); }
+.category-f2 { background-color: #0090d0; }
 .category-imsa { background-color: var(--accent-imsa); }
 .category-wrc { background-color: var(--accent-wrc); }
+.category-wec { background-color: #123456; }
+.category-motogp { background-color: #e32526; }
+.category-indycar { background-color: #c90227; }
+.category-nascar { background-color: #ffd600; color: #000; }
+.category-formula-e { background-color: #0000ff; }
 
 .race-card-content {
   padding: 1.5rem;
@@ -224,7 +230,14 @@ a {
 .race-circuit {
   color: var(--text-secondary);
   font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.race-broadcaster {
+  font-size: 0.85rem;
+  color: var(--accent-default);
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .race-datetime {

@@ -7,6 +7,7 @@ export const races = [
     circuit: "Silverstone Circuit",
     country: "United Kingdom",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/2022_Austrian_Grand_Prix_%2852208033092%29.jpg/1024px-2022_Austrian_Grand_Prix_%2852208033092%29.jpg", // F1 car
+    broadcaster: "F1TV / Fox Sports"
   },
   {
     id: 2,
@@ -16,6 +17,7 @@ export const races = [
     circuit: "Silverstone Circuit",
     country: "United Kingdom",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/FIA_F2_Austria_2018_Nr._8_Merhi.jpg/1024px-FIA_F2_Austria_2018_Nr._8_Merhi.jpg", // Open wheel car
+    broadcaster: "F1TV"
   },
   {
     id: 3,
@@ -25,6 +27,7 @@ export const races = [
     circuit: "Sachsenring",
     country: "Germany",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/MotoGP_Grid_QatarGP_2018.jpg/1024px-MotoGP_Grid_QatarGP_2018.jpg", // Motorcycle racing
+    broadcaster: "ESPN / Star+"
   },
   {
     id: 4,
@@ -34,6 +37,7 @@ export const races = [
     circuit: "Exhibition Place",
     country: "Canada",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/2019_Indy_500_-_Simon_Pagenaud.jpg/1024px-2019_Indy_500_-_Simon_Pagenaud.jpg", // Open wheel
+    broadcaster: "ESPN / Star+"
   },
   {
     id: 5,
@@ -43,6 +47,7 @@ export const races = [
     circuit: "Chicago Street Course",
     country: "USA",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Brad_Keselowski_2022_Auto_Club.jpg/1024px-Brad_Keselowski_2022_Auto_Club.jpg", // Stock cars / track
+    broadcaster: "Fox Sports"
   },
   {
     id: 6,
@@ -52,6 +57,7 @@ export const races = [
     circuit: "Interlagos",
     country: "Brazil",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Toyota_TS050_Hybrid_-_2018_24_Hours_of_Le_Mans.jpg/1024px-Toyota_TS050_Hybrid_-_2018_24_Hours_of_Le_Mans.jpg", // Endurance / Sports car
+    broadcaster: "FIAWEC.tv / Fox Sports 3"
   },
   {
     id: 7,
@@ -61,6 +67,7 @@ export const races = [
     circuit: "Watkins Glen International",
     country: "USA",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Porsche_963_Goodwood_Festival_of_Speed_2022_%281%29.jpg/1024px-Porsche_963_Goodwood_Festival_of_Speed_2022_%281%29.jpg", // GT / Sports car
+    broadcaster: "IMSA.tv"
   },
   {
     id: 8,
@@ -70,6 +77,7 @@ export const races = [
     circuit: "Tartu",
     country: "Estonia",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Thierry_Neuville_2019_Rally_Catalunya.jpg/1024px-Thierry_Neuville_2019_Rally_Catalunya.jpg", // Dirt / Rally
+    broadcaster: "Rally.TV / Red Bull TV"
   },
   {
     id: 9,
@@ -79,5 +87,6 @@ export const races = [
     circuit: "ExCeL London",
     country: "United Kingdom",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Jean-Eric_Vergne_Formula_E_Gen3.jpg/1024px-Jean-Eric_Vergne_Formula_E_Gen3.jpg", // Electric / modern track
+    broadcaster: "Claro Sports / Fox Sports 3"
   }
 ];

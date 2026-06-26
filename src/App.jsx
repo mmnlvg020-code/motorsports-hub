@@ -43,21 +43,53 @@ const Header = () => (
       target="_blank" 
       rel="noopener noreferrer"
       className="filter-btn active"
-      style={{ textDecoration: 'none', display: 'inline-block' }}
+      style={{ textDecoration: 'none', display: 'inline-block', backgroundColor: 'var(--accent-default)' }}
     >
-      Ir a PitSport 🚀
+      PitSport 🚀
     </a>
   </header>
 );
 
-const CategoryFilter = ({ selectedCategory, onSelectCategory, availableCategories }) => {
+const CategoryFilter = ({ 
+  selectedCategory, 
+  onSelectCategory, 
+  availableCategories, 
+  showFavoritesOnly, 
+  setShowFavoritesOnly,
+  favoritesCount,
+  weekendMode,
+  setWeekendMode
+}) => {
   return (
     <div className="filter-container">
+      <button 
+        className={`filter-btn ${weekendMode ? 'active' : ''}`}
+        onClick={() => setWeekendMode(!weekendMode)}
+        style={{ borderColor: weekendMode ? 'var(--accent-f1)' : 'var(--glass-border)' }}
+      >
+        🏁 Fin de Semana
+      </button>
+
+      <button 
+        className={`filter-btn ${showFavoritesOnly ? 'active' : ''}`}
+        onClick={() => {
+          setShowFavoritesOnly(!showFavoritesOnly);
+          setWeekendMode(false);
+        }}
+        style={{ borderColor: 'gold' }}
+      >
+        {showFavoritesOnly ? '⭐ Mis Favoritos' : `☆ Favoritos (${favoritesCount})`}
+      </button>
+
       {availableCategories.map(cat => (
         <button 
           key={cat}
-          className={`filter-btn ${selectedCategory === cat ? 'active' : ''}`}
-          onClick={() => onSelectCategory(cat)}
+          className={`filter-btn ${selectedCategory === cat && !showFavoritesOnly && !weekendMode ? 'active' : ''}`}
+          onClick={() => { 
+            onSelectCategory(cat); 
+            setShowFavoritesOnly(false);
+            setWeekendMode(false);
+          }}
         >
           {cat === 'All' ? 'Todas' : cat}
         </button>
@@ -96,7 +128,7 @@ const NextRaceCountdown = ({ nextRace }) => {
 
   return (
     <div className="countdown-section glass">
-      <div className="countdown-title">Próxima Carrera</div>
+      <div className="countdown-title">Próxima Carrera 🏎️💨</div>
       <div className="countdown-event">{nextRace.title}</div>
       <div className="countdown-timer">
         <div className="countdown-box">
@@ -120,7 +152,7 @@ const NextRaceCountdown = ({ nextRace }) => {
   );
 };
 
-const RaceCard = ({ race }) => {
+const RaceCard = ({ race, isFavorite, onToggleFavorite }) => {
   const localDate = new Date(race.date);
   
   // Format options for the browser's local timezone
@@ -135,13 +167,21 @@ const RaceCard = ({ race }) => {
     <div className="race-card glass">
       <div className="race-card-img-wrapper">
         <img src={race.image} alt={race.title} className="race-card-img" />
-        <span className={`category-badge category-${race.category.toLowerCase()}`}>
+        <span className={`category-badge category-${race.category.toLowerCase().replace(/\s+/g, '-')}`}>
           {race.category}
+          <span 
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(race.category); }} 
+            style={{ cursor: 'pointer', marginLeft: '8px', fontSize: '1rem', textShadow: '0 0 5px rgba(0,0,0,0.8)' }}
+            title={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+          >
+            {isFavorite ? '⭐' : '☆'}
+          </span>
         </span>
       </div>
       <div className="race-card-content">
         <h3 className="race-title">{race.title}</h3>
         <div className="race-circuit">{race.circuit}, {race.country}</div>
+        <div className="race-broadcaster">📺 {race.broadcaster || "Por confirmar"}</div>
         
         <div className="race-datetime">
           <div>
@@ -162,6 +202,27 @@ function App() {
   const [upcomingRaces, setUpcomingRaces] = useState([]);
   const [nextRace, setNextRace] = useState(null);
   const [availableCategories, setAvailableCategories] = useState(['All']);
+  
+  // New States for Phase 2 Features
+  const [favorites, setFavorites] = useState(() => {
+    const saved = localStorage.getItem('motorsports-favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [weekendMode, setWeekendMode] = useState(false);
+
+  // Save favorites to localStorage
+  useEffect(() => {
+    localStorage.setItem('motorsports-favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (category) => {
+    setFavorites(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
 
   useEffect(() => {
     const now = new Date();
@@ -171,39 +232,68 @@ function App() {
       .sort((a, b) => new Date(a.date) - new Date(b.date));
     
     setUpcomingRaces(futureRaces);
-    if (futureRaces.length > 0) {
-      setNextRace(futureRaces[0]);
-    }
 
     // Extract unique categories from the races data
     const uniqueCategories = [...new Set(races.map(r => r.category))];
     setAvailableCategories(['All', ...uniqueCategories]);
   }, []);
 
-  const filteredRaces = selectedCategory === 'All' 
-    ? upcomingRaces 
-    : upcomingRaces.filter(r => r.category === selectedCategory);
+  // Update Next Race logic to prioritize favorites
+  useEffect(() => {
+    if (upcomingRaces.length === 0) return;
+    
+    if (favorites.length > 0) {
+      // Find the next upcoming race that is in the favorites list
+      const nextFav = upcomingRaces.find(r => favorites.includes(r.category));
+      setNextRace(nextFav || upcomingRaces[0]);
+    } else {
+      setNextRace(upcomingRaces[0]);
+    }
+  }, [upcomingRaces, favorites]);
+
+  // Apply filters
+  let filteredRaces = upcomingRaces;
+  if (weekendMode) {
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    filteredRaces = filteredRaces.filter(r => new Date(r.date) <= nextWeek);
+  } else if (showFavoritesOnly && favorites.length > 0) {
+    filteredRaces = filteredRaces.filter(r => favorites.includes(r.category));
+  } else if (selectedCategory !== 'All') {
+    filteredRaces = filteredRaces.filter(r => r.category === selectedCategory);
+  }
 
   return (
     <div className="app-container">
       <Header />
       
+      {/* Show countdown only if we are viewing everything or favorites/weekend */}
       {selectedCategory === 'All' && <NextRaceCountdown nextRace={nextRace} />}
       
       <CategoryFilter 
         selectedCategory={selectedCategory} 
         onSelectCategory={setSelectedCategory} 
         availableCategories={availableCategories}
+        showFavoritesOnly={showFavoritesOnly}
+        setShowFavoritesOnly={setShowFavoritesOnly}
+        favoritesCount={favorites.length}
+        weekendMode={weekendMode}
+        setWeekendMode={setWeekendMode}
       />
 
       <div className="race-grid">
         {filteredRaces.map(race => (
-          <RaceCard key={race.id} race={race} />
+          <RaceCard 
+            key={race.id} 
+            race={race} 
+            isFavorite={favorites.includes(race.category)}
+            onToggleFavorite={toggleFavorite}
+          />
         ))}
         
         {filteredRaces.length === 0 && (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
-            No hay carreras futuras para esta categoría.
+            No hay carreras futuras para esta categoría o filtro.
           </div>
         )}
       </div>
